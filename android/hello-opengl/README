@@ -1,0 +1,61 @@
+This is a very early attempt to make a Lisp system for games on
+Android.
+
+At this moment, we are able to communicate from Lisp to OpenGL. Right
+now the background color is set to grey. That's it.
+
+Also, when there is a touch event, we pass the touch event to Lisp.
+
+The example for touch is not working properly. After a touch the
+systems tries to draw a cross on the center of the touch, but some
+dark error occurs (most likely on the OpenGL side) and the program
+crashes beautifully.
+
+The next step of the development is to fix that bug, to be able to
+draw primitives from OpenGL, be able to draw textures from OpenGL, and
+to be able to reproduce sound.
+
+Code structure:
+
+- src/com/example/helloopengl/HelloOpenGL.java
+
+   is the main Java file. From there we create the ECL instance and boot it. 
+
+- jni/*
+   
+   is the C code necesssary to bind Java and ECL. The code structure
+   is very sloppy right now. Some functions shouldn't be on ecl_boot.*
+   but in their own file. I'll fix that when OpenGL works properly.
+
+- jni/eclffi/*
+
+   the library that connects Lisp and OpenGL must be statically
+   compiled, rather than loaded from a lisp file. This folder contains
+   the source .lisp. Also it contains the makefile and scripts
+   necessary to make the static library.
+
+- assets/lips/*
+
+   contains the .lisp files that are loaded at run-time into ECL.
+   
+Making it run:
+
+- make ECL: 
+   follow the instructions in the top folder of the project. I.e., you
+   first need to set up ECL.
+
+- make libeclffi.a: 
+   cd jni/eclffi/
+   (edit makefile, so the path to ECL and GMP is correct)
+   (sudo) make
+   (depending on where you installed ECL and GMP you might need to use
+   "sudo")
+
+- make the JNI:
+   ndk-build
+
+- install on a device:
+   (sudo) ant install
+
+of course, to install on a device you need an Android device connected
+to your computer, or the emulator running.
